@@ -1,7 +1,3 @@
-Great! Here's the updated and detailed `README.md` for your **Laravel Backup Service** package, including the section on how to send the Google Drive backup link via Telegram:
-
----
-
 # Laravel Backup Service
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ahmedweb/laravel-backup-service.svg)](https://packagist.org/packages/ahmedweb/laravel-backup-service)
