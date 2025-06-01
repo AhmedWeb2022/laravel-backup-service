@@ -1,35 +1,14 @@
+Here is your **updated `README.md`** file with the **Telegram Bot setup** and **Laravel 11 provider/schedule injection instructions** fully integrated.
+
+---
+
+````markdown
 # Laravel Backup Service
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ahmedweb/laravel-backup-service.svg)](https://packagist.org/packages/ahmedweb/laravel-backup-service)
 [![License: MIT](https://img.shields.io/github/license/ahmedweb/laravel-backup-service.svg)](LICENSE.md)
 
 A Laravel package that simplifies application backups using Google Drive storage, provides Artisan commands to manage them, and sends the latest backup link directly to your Telegram group.
-
----
-
-## 🔐 Getting Google Drive Credentials & Refresh Token
-
-To connect your Laravel backup service with Google Drive, you need credentials and a refresh token:
-
-1. **Create a Google Cloud Project & OAuth Credentials**
-   Visit the [Google Cloud Console](https://console.cloud.google.com)
-
-   * Create a new project
-   * Navigate to **APIs & Services > Credentials**
-   * Create OAuth 2.0 Client ID credentials (Choose Application type: Web Application)
-   * Note your **Client ID** and **Client Secret**
-
-2. **Obtain the Refresh Token using OAuth 2.0 Playground**
-   Go to the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground)
-
-   * In Step 1, select **Google Drive API v3** scopes (e.g., `https://www.googleapis.com/auth/drive.file`)
-   * Click **Authorize APIs** and login with your Google account
-   * In Step 2, click **Exchange authorization code for tokens**
-   * Copy the **Refresh Token** provided
-
-3. **Helpful Tutorial**
-   For detailed step-by-step instructions, refer to this tutorial:
-   [How to backup your Laravel application in Google Drive](https://medium.com/@al_imran_ahmed/how-to-backup-your-laravel-application-in-google-drive-2803c31756a0)
 
 ---
 
@@ -50,9 +29,7 @@ Install the package using Composer:
 
 ```bash
 composer require ahmedweb/laravel-backup-service
-```
-
----
+````
 
 After installation, publish the package configuration and files with:
 
@@ -109,54 +86,81 @@ To enable Telegram backup link notifications:
 
 #### Step 1: Create Your Telegram Bot
 
-1. **Open Telegram**
-   Launch the Telegram app on your device or access the [web version](https://web.telegram.org).
+1. **Open Telegram**: Launch the Telegram app or go to the [web version](https://web.telegram.org/).
+2. **Find BotFather**: Search for `@BotFather` and start a conversation.
+3. **Start a Chat**: Click “Start” or type `/start`.
+4. **Create a New Bot**: Use `/newbot` and follow prompts to set:
 
-2. **Find the BotFather**
-   In the search bar, type `@BotFather` and select the official BotFather bot.
-
-3. **Start a Chat**
-   Click on the "Start" button or type `/start` to initiate the conversation with BotFather.
-
-4. **Create a New Bot**
-   Use the command `/newbot` to create a new bot. BotFather will ask you to choose a name and a username:
-
-   * **Name**: This is the display name of your bot (e.g., `My Awesome Bot`)
-   * **Username**: Must be unique and end with `bot` (e.g., `myawesome_bot`)
-
-5. **Get Your API Token**
-   Once your bot is created, BotFather will provide you with an API token. Example:
+   * **Name** (e.g., My Awesome Bot)
+   * **Username** (must end in `bot`, e.g., `myawesome_bot`)
+5. **Get Your API Token**: BotFather will return a token like:
 
    ```
    123456789:ABCdefGhIJKlmNoPQRstUvWxYz1234567890
    ```
 
-   Save this token, as you will need it to connect your Laravel application to your bot.
+   Save it for your `.env` file.
 
----
+#### Step 2: Add Bot to Group
 
-#### Step 2: Create a Telegram Group
+1. Create a new group in Telegram.
+2. Add your bot to the group.
+3. Mention the bot once to activate it.
 
-1. Create a group and add your newly created bot to it.
-2. Mention the bot once in the group to activate it.
+#### Step 3: Get Group Chat ID
 
----
+* Use `@userinfobot` or your bot logs.
+* Or send a message using your bot and inspect the `chat.id` in the response.
 
-#### Step 3: Get Your Group Chat ID
-
-* Use a Telegram tool like `@userinfobot` or check your own bot's message logs
-* Or send a message from your bot to the group, then inspect the logs for `chat.id`
-
----
-
-#### Step 4: Add to `.env`
+#### Step 4: Update `.env`
 
 ```env
-TELEGRAM_BOT_TOKEN=123456:ABC-YourBotToken
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRstUvWxYz1234567890
 TELEGRAM_CHAT_ID=-1001234567890
 ```
 
-Once configured, your bot will be able to post backup links directly to your group.
+---
+
+## 🧩 Application Bootstrap Setup (Laravel 11)
+
+If you're using **Laravel 11**, ensure you inject the storage provider and optionally schedule the backup commands:
+
+### Register the `GoogleDriveStorageProvider`
+
+In `bootstrap/app.php`, add:
+
+```php
+use AhmedWeb\LaravelBackupService\Providers\GoogleDriveStorageProvider;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withProviders([
+        GoogleDriveStorageProvider::class,
+    ])
+    ->create();
+```
+
+### Optional: Add Scheduled Commands
+
+Still in `bootstrap/app.php`, you can define the scheduler:
+
+```php
+use Illuminate\Console\Scheduling\Schedule;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('backup:run')->everyMinute();
+        $schedule->command('backup:clean')->everyMinute();
+        $schedule->command('backup:store-link', ['sass'])->everyMinute();
+        $schedule->command('backup:delete-old-files')->everyMinute();
+    })
+    ->create();
+```
+
+Ensure your system cron is running Laravel’s scheduler:
+
+```bash
+* * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
+```
 
 ---
 
@@ -168,7 +172,7 @@ Once configured, your bot will be able to post backup links directly to your gro
 | `php artisan backup:delete-old`        | Deletes all older backup files from Google Drive             |
 | `php artisan backup:clean-drive`       | Cleans backups on Google Drive based on retention            |
 
-You can schedule these in `app/Console/Kernel.php`:
+You can schedule these in `app/Console/Kernel.php` (Laravel <=10):
 
 ```php
 $schedule->command('backup:store-latest-link')->daily();
@@ -189,7 +193,7 @@ laravel-backup-service/
 │   ├── Services/
 │   │   └── GoogleDriveBackupService.php
 │   ├── Providers/
-│   │   └── BackupServiceProvider.php
+│   │   └── GoogleDriveStorageProvider.php
 ├── config/
 │   └── filesystems.php (merged if needed)
 ```
@@ -230,4 +234,10 @@ Licensed under the [MIT license](LICENSE.md).
 
 ---
 
-Would you like me to export this file (e.g., as `README.md`) or push it directly into your Laravel package repository?
+## 🔗 Helpful Resources
+
+* [Google Developer Console](https://console.cloud.google.com) — Get credentials
+* [OAuth Playground](https://developers.google.com/oauthplayground) — Get refresh token
+* [Detailed Tutorial](https://medium.com/@al_imran_ahmed/how-to-backup-your-laravel-application-in-google-drive-2803c31756a0)
+
+
