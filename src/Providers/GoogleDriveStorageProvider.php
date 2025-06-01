@@ -25,19 +25,15 @@ class GoogleDriveStorageProvider extends ServiceProvider
 
             $client = new Client();
             $client->setClientId($config['clientId']);
-            Log::info('Google Drive Client ID set: ' . $config['clientId']);
 
             $client->setClientSecret($config['clientSecret']);
-            Log::info('Google Drive Client Secret set.');
 
             $client->refreshToken($config['refreshToken']);
-            Log::info('Google Drive Refresh Token set.');
 
             $service = new Drive($client);
             $folderId = $config['folderId'] ?? 'root';
 
             $adapter = new GoogleDriveAdapter($service, $folderId);
-            Log::info('GoogleDriveAdapter initialized with folder ID: ' . $folderId);
 
             $flysystem = new \League\Flysystem\Filesystem($adapter);
 

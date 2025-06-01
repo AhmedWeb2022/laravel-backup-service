@@ -35,9 +35,6 @@ class BackupServiceProvider extends ServiceProvider
         // Merge configs
         $this->mergeConfigFrom(__DIR__ . '/Config/BackupService.php', 'laravel-backup-service');
         $this->mergeConfigFrom(__DIR__ . '/Config/filesystems.php', 'filesystems');
-
-        // $this->mergeConfigFrom(__DIR__ . '/Config/BackupService.php', 'laravel-backup-service');
-        // Log::info('BackupServiceProvider: Registering commands');
         $this->commands([
             CleanGoogleDriveBackups::class,
             StoreLatestBackupLink::class,
@@ -46,7 +43,6 @@ class BackupServiceProvider extends ServiceProvider
     }
     public function boot(): void
     {
-
         $this->publishes([
             __DIR__ . '/Config/BackupService.php' => config_path('laravel-backup-service.php'),
             __DIR__ . '/Config/backup.php' => config_path('backup.php'),
