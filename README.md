@@ -31,7 +31,13 @@ composer require ahmedweb/laravel-backup-service
 ```
 
 ---
+After installation, publish the package configuration and files with:
 
+```bash
+php artisan vendor:publish --tag=laravel-backup-service
+
+```
+---
 ## 🛠️ Configuration
 
 ### 1. Environment Variables
