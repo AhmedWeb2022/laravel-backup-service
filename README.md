@@ -7,6 +7,32 @@ A Laravel package that simplifies application backups using Google Drive storage
 
 ---
 
+## 🔐 Getting Google Drive Credentials & Refresh Token
+
+To connect your Laravel backup service with Google Drive, you need credentials and a refresh token:
+
+1. **Create a Google Cloud Project & OAuth Credentials**
+   Visit the [Google Cloud Console](https://console.cloud.google.com)
+
+   * Create a new project
+   * Navigate to **APIs & Services > Credentials**
+   * Create OAuth 2.0 Client ID credentials (Choose Application type: Web Application)
+   * Note your **Client ID** and **Client Secret**
+
+2. **Obtain the Refresh Token using OAuth 2.0 Playground**
+   Go to the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground)
+
+   * In Step 1, select **Google Drive API v3** scopes (e.g., `https://www.googleapis.com/auth/drive.file`)
+   * Click **Authorize APIs** and login with your Google account
+   * In Step 2, click **Exchange authorization code for tokens**
+   * Copy the **Refresh Token** provided
+
+3. **Helpful Tutorial**
+   For detailed step-by-step instructions, refer to this tutorial:
+   [How to backup your Laravel application in Google Drive](https://medium.com/@al_imran_ahmed/how-to-backup-your-laravel-application-in-google-drive-2803c31756a0)
+
+---
+
 ## 🚀 Features
 
 * Upload Laravel backups to **Google Drive**
@@ -27,13 +53,15 @@ composer require ahmedweb/laravel-backup-service
 ```
 
 ---
+
 After installation, publish the package configuration and files with:
 
 ```bash
 php artisan vendor:publish --tag=laravel-backup-service
-
 ```
+
 ---
+
 ## 🛠️ Configuration
 
 ### 1. Environment Variables
@@ -79,28 +107,54 @@ To enable Telegram backup link notifications:
 
 ### Step-by-step:
 
-1. **Create a bot**
+#### Step 1: Create Your Telegram Bot
 
-   * Go to [BotFather](https://t.me/BotFather) on Telegram
-   * Use `/newbot` to create a bot
-   * Save the **bot token**
+1. **Open Telegram**
+   Launch the Telegram app on your device or access the [web version](https://web.telegram.org).
 
-2. **Create a Telegram group**
+2. **Find the BotFather**
+   In the search bar, type `@BotFather` and select the official BotFather bot.
 
-   * Add the bot to the group
-   * Mention the bot once in the group to activate it
+3. **Start a Chat**
+   Click on the "Start" button or type `/start` to initiate the conversation with BotFather.
 
-3. **Get your group chat ID**
+4. **Create a New Bot**
+   Use the command `/newbot` to create a new bot. BotFather will ask you to choose a name and a username:
 
-   * Use a Telegram API tool like `@userinfobot` or your own bot's message logs
-   * Or temporarily send a message from your bot and check the logs for `chat.id`
+   * **Name**: This is the display name of your bot (e.g., `My Awesome Bot`)
+   * **Username**: Must be unique and end with `bot` (e.g., `myawesome_bot`)
 
-4. **Add to `.env`**:
+5. **Get Your API Token**
+   Once your bot is created, BotFather will provide you with an API token. Example:
 
-   ```env
-   TELEGRAM_BOT_TOKEN=123456:ABC-YourBotToken
-   TELEGRAM_CHAT_ID=-1001234567890
    ```
+   123456789:ABCdefGhIJKlmNoPQRstUvWxYz1234567890
+   ```
+
+   Save this token, as you will need it to connect your Laravel application to your bot.
+
+---
+
+#### Step 2: Create a Telegram Group
+
+1. Create a group and add your newly created bot to it.
+2. Mention the bot once in the group to activate it.
+
+---
+
+#### Step 3: Get Your Group Chat ID
+
+* Use a Telegram tool like `@userinfobot` or check your own bot's message logs
+* Or send a message from your bot to the group, then inspect the logs for `chat.id`
+
+---
+
+#### Step 4: Add to `.env`
+
+```env
+TELEGRAM_BOT_TOKEN=123456:ABC-YourBotToken
+TELEGRAM_CHAT_ID=-1001234567890
+```
 
 Once configured, your bot will be able to post backup links directly to your group.
 
@@ -176,4 +230,4 @@ Licensed under the [MIT license](LICENSE.md).
 
 ---
 
-Would you like this `README.md` saved to your project directory or formatted for publishing on GitHub/Packagist?
+Would you like me to export this file (e.g., as `README.md`) or push it directly into your Laravel package repository?
