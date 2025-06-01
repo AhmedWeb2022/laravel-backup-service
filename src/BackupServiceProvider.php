@@ -49,7 +49,7 @@ class BackupServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/Config/BackupService.php' => config_path('laravel-backup-service.php'),
-            __DIR__ . '/Config/filesystems.php' => config_path('filesystems.php'),
+            __DIR__ . '/Config/backup.php' => config_path('backup.php'),
             __DIR__ . '/Providers/GoogleDriveStorageProvider.php' => app_path('Providers/GoogleDriveStorageProvider.php'),
         ], 'laravel-backup-service');
     }
